@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>¿Besitos para contentarte? 🥺❤️</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <!-- Canvas Confetti -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+
+  <style>
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: radial-gradient(circle at 20% 20%, #ffe4e6 0%, #fed7aa 40%, #fbcfe8 100%);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    .font-handwriting {
+      font-family: 'Caveat', cursive;
+    }
+
+    /* Floating hearts background animation */
+    .bg-heart {
+      position: absolute;
+      color: rgba(244, 63, 94, 0.25);
+      user-select: none;
+      pointer-events: none;
+      animation: floatUp 8s linear infinite;
+    }
+
+    @keyframes floatUp {
+      0% {
+        transform: translateY(110vh) scale(0.6) rotate(0deg);
+        opacity: 0;
+      }
+      20% {
+        opacity: 0.8;
+      }
+      80% {
+        opacity: 0.8;
+      }
+      100% {
+        transform: translateY(-10vh) scale(1.2) rotate(360deg);
+        opacity: 0;
+      }
+    }
+
+    /* Pulse glow for primary CTA */
+    .pulse-glow {
+      box-shadow: 0 0 0 0 rgba(244, 63, 94, 0.6);
+      animation: pulseAnim 2s infinite;
+    }
+
+    @keyframes pulseAnim {
+      0% {
+        box-shadow: 0 0 0 0 rgba(244, 63, 94, 0.7);
+      }
+      70% {
+        box-shadow: 0 0 0 16px rgba(244, 63, 94, 0);
+      }
+      100% {
+        box-shadow: 0 0 0 0 rgba(244, 63, 94, 0);
+      }
+    }
+
+    /* Smooth page card transitions */
+    .view-card {
+      transition: all 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+  </style>
+</head>
+<body class="relative flex items-center justify-center min-h-screen p-4 select-none">
+
+  <!-- Contenedor de corazones de fondo dinámicos -->
+  <div id="heartBgContainer" class="fixed inset-0 overflow-hidden pointer-events-none z-0"></div>
+
+  <!-- VISTA 1: La pregunta inicial con botón escurridizo -->
+  <main id="view1" class="view-card relative z-10 w-full max-w-md bg-white/90 backdrop-blur-md rounded-3xl p-6 sm:p-8 shadow-2xl border border-rose-200 text-center">
+    <!-- Imagen tierna GIF -->
+    <div class="relative w-44 h-44 sm:w-52 sm:h-52 mx-auto mb-5 rounded-2xl overflow-hidden shadow-inner bg-rose-50 flex items-center justify-center border-4 border-rose-200">
+      <img 
+        id="gifView1"
+        src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExM3ZtOGc3N3J6eGdtN2Z6enF1MWpjeWJ6cGhyNDlqdnp1bmR3cWRnYSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/MDJ9IbxxvDUQM/giphy.gif" 
+        alt="Gatito tierno pidiendo perdón"
+        class="w-full h-full object-cover"
+        loading="eager"
+      />
+    </div>
+
+    <!-- Título y mensaje -->
+    <span class="inline-block px-3 py-1 bg-rose-100 text-rose-600 rounded-full text-xs font-bold tracking-wider uppercase mb-2">
+      Una preguntita muy seria 🙈
+    </span>
+    <h1 class="text-2xl sm:text-3xl font-extrabold text-gray-800 leading-tight mb-2">
+      ¿Si te doy besitos ya no te caeré mal?
+    </h1>
+    <p class="text-rose-500 font-handwriting text-2xl sm:text-3xl mb-6">
+      Di que sí por favor... 🥺❤️
+    </p>
+
+    <!-- Contenedor de Botones -->
+    <div class="relative flex items-center justify-center gap-4 min-h-[70px] mt-2">
+      <!-- Botón SÍ -->
+      <button 
+        id="btnYes"
+        class="pulse-glow px-8 py-3.5 bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600 text-white font-extrabold text-lg rounded-2xl shadow-lg transform transition active:scale-95 cursor-pointer">
+        ¡Sí! 🥰
+      </button>
+
+      <!-- Botón NO (Evasivo / Saltador) -->
+      <button 
+        id="btnNo"
+        class="px-8 py-3.5 bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold text-lg rounded-2xl shadow-sm transition-all duration-150 cursor-pointer">
+        No 😒
+      </button>
+    </div>
+  </main>
+
+  <!-- VISTA 2: Selector de besitos -->
+  <section id="view2" class="view-card hidden relative z-10 w-full max-w-md bg-white/95 backdrop-blur-md rounded-3xl p-6 sm:p-8 shadow-2xl border border-rose-200 text-center">
+    <!-- Imagen tierna feliz -->
+    <div class="relative w-44 h-44 sm:w-48 sm:h-48 mx-auto mb-4 rounded-2xl overflow-hidden shadow-inner bg-rose-50 border-4 border-rose-200">
+      <img 
+        src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExODlhNDc5N2F4ZDB1amJmNmhrcTZ2bDBia2Rrd3gxdHRmc2p6dmFveCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/ICOgUNjpvO0PC/giphy.gif" 
+        alt="Gatitos dándose amor"
+        class="w-full h-full object-cover"
+      />
+    </div>
+
+    <span class="inline-block px-3 py-1 bg-pink-100 text-pink-600 rounded-full text-xs font-bold tracking-wider uppercase mb-1">
+      ¡Sabía que no podías resistirte!
+    </span>
+    <h2 class="text-2xl sm:text-3xl font-extrabold text-gray-800 mb-1">
+      Ahora dime la verdad...
+    </h2>
+    <p class="text-gray-600 font-semibold mb-5 text-sm sm:text-base">
+      ¿Cuántos besitos quieres recibir para estar en paz? 😘
+    </p>
+
+    <!-- Selector interactivo numérico -->
+    <div class="bg-rose-50/80 rounded-2xl p-4 border border-rose-100 mb-5">
+      <div class="flex items-center justify-center gap-4">
+        <button 
+          id="btnMinus" 
+          aria-label="Restar besito"
+          class="w-12 h-12 flex items-center justify-center rounded-xl bg-white border border-rose-200 text-rose-500 font-black text-2xl shadow hover:bg-rose-100 active:scale-95 transition">
+          -
+        </button>
+        <div class="flex flex-col items-center">
+          <input 
+            type="number" 
+            id="kissCountInput" 
+            value="100" 
+            min="1" 
+            step="1"
+            class="w-28 text-center text-3xl font-black text-rose-600 bg-transparent border-b-2 border-rose-300 focus:outline-none focus:border-rose-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+          />
+          <span class="text-xs text-rose-400 font-bold uppercase tracking-wider mt-1">Besitos</span>
+        </div>
+        <button 
+          id="btnPlus" 
+          aria-label="Sumar besito"
+          class="w-12 h-12 flex items-center justify-center rounded-xl bg-white border border-rose-200 text-rose-500 font-black text-2xl shadow hover:bg-rose-100 active:scale-95 transition">
+          +
+        </button>
+      </div>
+
+      <!-- Accesos directos rápidos -->
+      <div class="grid grid-cols-4 gap-2 mt-4 pt-3 border-t border-rose-200/60">
+        <button type="button" class="preset-btn px-2 py-1.5 text-xs sm:text-sm font-bold bg-white text-rose-600 rounded-lg shadow-sm border border-rose-200 hover:bg-rose-500 hover:text-white transition" data-amount="10">10</button>
+        <button type="button" class="preset-btn px-2 py-1.5 text-xs sm:text-sm font-bold bg-white text-rose-600 rounded-lg shadow-sm border border-rose-200 hover:bg-rose-500 hover:text-white transition" data-amount="100">100</button>
+        <button type="button" class="preset-btn px-2 py-1.5 text-xs sm:text-sm font-bold bg-white text-rose-600 rounded-lg shadow-sm border border-rose-200 hover:bg-rose-500 hover:text-white transition" data-amount="1000">1,000</button>
+        <button type="button" class="preset-btn px-2 py-1.5 text-xs sm:text-sm font-bold bg-gradient-to-r from-rose-400 to-pink-500 text-white rounded-lg shadow-sm hover:opacity-90 transition" data-amount="inf">¡Infinitos! ✨</button>
+      </div>
+    </div>
+
+    <!-- Advertencia cuando intentan poner 0 o negativo -->
+    <p id="validationWarning" class="text-xs text-red-500 font-bold mb-3 hidden">
+      ⚠️ ¡Oye! No puedes pedir 0 besitos. ¡El mínimo es 1! 💕
+    </p>
+
+    <!-- Botón de Confirmación -->
+    <button 
+      id="btnClaimKisses"
+      class="w-full py-4 bg-gradient-to-r from-rose-500 via-pink-500 to-red-500 hover:from-rose-600 hover:to-pink-600 text-white font-extrabold text-lg rounded-2xl shadow-xl transform transition active:scale-95 cursor-pointer">
+      Reclamar mis besitos 😘
+    </button>
+  </section>
+
+  <!-- VISTA 3: Pantalla de confirmación y entrega de besitos -->
+  <section id="view3" class="view-card hidden relative z-10 w-full max-w-md bg-white/95 backdrop-blur-md rounded-3xl p-6 sm:p-8 shadow-2xl border border-rose-200 text-center">
+    <div class="relative w-44 h-44 sm:w-52 sm:h-52 mx-auto mb-4 rounded-2xl overflow-hidden shadow-inner bg-rose-50 border-4 border-rose-200">
+      <img 
+        src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExOXVvaWR6OXFva3I1ZWFjcm05eGtzNnh2bnZrbXR4bDZqdnE5N2l2NiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/gDfteqLchLcRTtjAD7/giphy.gif" 
+        alt="Muchos besitos llenos de amor"
+        class="w-full h-full object-cover"
+      />
+    </div>
+
+    <div class="inline-flex items-center gap-1.5 px-3 py-1 bg-rose-100 text-rose-600 rounded-full text-xs font-bold uppercase tracking-wider mb-2">
+      <span>🎉</span> ¡Trato Hecho! <span>🎉</span>
+    </div>
+
+    <h2 class="text-2xl sm:text-3xl font-extrabold text-gray-800 mb-2">
+      ¡Pedido confirmado con éxito!
+    </h2>
+
+    <p class="text-gray-600 text-base mb-4 leading-relaxed">
+      Tienes pendiente recibir:
+      <span id="finalKissDisplay" class="block text-3xl sm:text-4xl font-black text-rose-500 my-2 font-handwriting">
+        100 besitos
+      </span>
+      ¡Así que ven aquí y prepárate que no te salvarás de ninguno! ❤️
+    </p>
+
+    <!-- Botón reiniciar / cambiar cantidad -->
+    <button 
+      id="btnReset"
+      class="mt-2 px-6 py-2.5 bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 font-bold text-sm rounded-xl transition cursor-pointer active:scale-95">
+      🔄 Pedir más besitos o reiniciar
+    </button>
+  </section>
+
+  <script>
+    const view1 = document.getElementById('view1');
+    const view2 = document.getElementById('view2');
+    const view3 = document.getElementById('view3');
+
+    const btnYes = document.getElementById('btnYes');
+    const btnNo = document.getElementById('btnNo');
+
+    const btnMinus = document.getElementById('btnMinus');
+    const btnPlus = document.getElementById('btnPlus');
+    const kissCountInput = document.getElementById('kissCountInput');
+    const presetButtons = document.querySelectorAll('.preset-btn');
+    const btnClaimKisses = document.getElementById('btnClaimKisses');
+    const validationWarning = document.getElementById('validationWarning');
+
+    const finalKissDisplay = document.getElementById('finalKissDisplay');
+    const btnReset = document.getElementById('btnReset');
+
+    let isInfinite = false;
+    let dodgeCount = 0;
+
+    const funnyPhrases = [
+      "¿Segura? 🤨",
+      "¡Oye no! 🙈",
+      "¡Tramposa! 😂",
+      "Ni lo intentes 😜",
+      "¡Acepta el sí! ✨",
+      "¡No te escapas! 💕",
+      "¡Por favor! 🥺",
+      "¡Aquí no es! 💨"
+    ];
+
+    function createBackgroundHearts() {
+      const container = document.getElementById('heartBgContainer');
+      const icons = ['❤️', '💖', '💕', '✨', '🌸', '💋'];
+      
+      setInterval(() => {
+        if (document.hidden) return;
+        const heart = document.createElement('div');
+        heart.className = 'bg-heart';
+        heart.innerText = icons[Math.floor(Math.random() * icons.length)];
+        heart.style.left = Math.random() * 100 + 'vw';
+        heart.style.fontSize = (Math.random() * 18 + 14) + 'px';
+        heart.style.animationDuration = (Math.random() * 4 + 6) + 's';
+        container.appendChild(heart);
+
+        setTimeout(() => {
+          heart.remove();
+        }, 8000);
+      }, 450);
+    }
+    createBackgroundHearts();
+
+    function dodgeButton(e) {
+      if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+
+      // Cambiar texto por una frase divertida
+      dodgeCount++;
+      const phrase = funnyPhrases[dodgeCount % funnyPhrases.length];
+      btnNo.textContent = phrase;
+
+      // Medidas de la ventana y el botón
+      const btnRect = btnNo.getBoundingClientRect();
+      const padding = 20;
+      
+      const maxX = window.innerWidth - btnRect.width - padding;
+      const maxY = window.innerHeight - btnRect.height - padding;
+
+      // Calcular posición aleatoria dentro de la pantalla visible
+      const randomX = Math.max(padding, Math.floor(Math.random() * maxX));
+      const randomY = Math.max(padding, Math.floor(Math.random() * maxY));
+
+      // Estilo absoluto en pantalla completa para poder escapar de la tarjeta
+      btnNo.style.position = 'fixed';
+      btnNo.style.left = `${randomX}px`;
+      btnNo.style.top = `${randomY}px`;
+      btnNo.style.zIndex = '999';
+
+      // Efecto sutil de crecimiento y rotación traviesa
+      const randomRot = (Math.random() * 20 - 10).toFixed(1);
+      btnNo.style.transform = `scale(1.05) rotate(${randomRot}deg)`;
+
+      // Agrandar un poco el botón "Sí" como incentivo
+      const currentScale = 1 + Math.min(dodgeCount * 0.05, 0.35);
+      btnYes.style.transform = `scale(${currentScale})`;
+    }
+
+    // Eventos para desktop y móvil
+    btnNo.addEventListener('mouseenter', dodgeButton);
+    btnNo.addEventListener('mouseover', dodgeButton);
+    btnNo.addEventListener('touchstart', dodgeButton, { passive: false });
+    btnNo.addEventListener('click', dodgeButton);
+
+    btnYes.addEventListener('click', () => {
+      // Disparar confeti inicial
+      confetti({
+        particleCount: 70,
+        spread: 70,
+        origin: { y: 0.6 }
+      });
+
+      // Restaurar el botón No por si vuelve
+      btnNo.style.position = 'relative';
+      btnNo.style.left = 'auto';
+      btnNo.style.top = 'auto';
+      btnNo.textContent = 'No 😒';
+      btnNo.style.transform = 'none';
+
+      // Cambiar de vista
+      view1.classList.add('hidden');
+      view2.classList.remove('hidden');
+    });
+
+    function updateCounter(val) {
+      isInfinite = false;
+      let numericVal = parseInt(val, 10);
+
+      if (isNaN(numericVal) || numericVal < 1) {
+        numericVal = 1;
+        validationWarning.classList.remove('hidden');
+      } else {
+        validationWarning.classList.add('hidden');
+      }
+
+      kissCountInput.value = numericVal;
+    }
+
+    btnPlus.addEventListener('click', () => {
+      if (isInfinite) {
+        updateCounter(100);
+        return;
+      }
+      const current = parseInt(kissCountInput.value, 10) || 1;
+      updateCounter(current + (current >= 100 ? 50 : 5));
+    });
+
+    btnMinus.addEventListener('click', () => {
+      if (isInfinite) {
+        updateCounter(100);
+        return;
+      }
+      const current = parseInt(kissCountInput.value, 10) || 1;
+      if (current <= 1) {
+        validationWarning.classList.remove('hidden');
+        return;
+      }
+      const step = current > 100 ? 50 : (current > 10 ? 5 : 1);
+      updateCounter(Math.max(1, current - step));
+    });
+
+    kissCountInput.addEventListener('input', (e) => {
+      isInfinite = false;
+      const val = parseInt(e.target.value, 10);
+      if (val < 1 || isNaN(val)) {
+        validationWarning.classList.remove('hidden');
+      } else {
+        validationWarning.classList.add('hidden');
+      }
+    });
+
+    kissCountInput.addEventListener('blur', () => {
+      if (!isInfinite) {
+        updateCounter(kissCountInput.value);
+      }
+    });
+
+    // Botones rápidos (presets)
+    presetButtons.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const amount = btn.getAttribute('data-amount');
+        if (amount === 'inf') {
+          isInfinite = true;
+          kissCountInput.value = '∞';
+          validationWarning.classList.add('hidden');
+        } else {
+          updateCounter(amount);
+        }
+      });
+    });
+
+    function launchCelebrationRain() {
+      const duration = 3.5 * 1000;
+      const animationEnd = Date.now() + duration;
+      const colors = ['#f43f5e', '#ec4899', '#fb7185', '#fda4af', '#f472b6'];
+
+      const interval = setInterval(function() {
+        const timeLeft = animationEnd - Date.now();
+
+        if (timeLeft <= 0) {
+          return clearInterval(interval);
+        }
+
+        const particleCount = 40 * (timeLeft / duration);
+        confetti({
+          particleCount,
+          startVelocity: 30,
+          spread: 360,
+          ticks: 60,
+          origin: {
+            x: Math.random(),
+            y: Math.random() - 0.2
+          },
+          colors: colors,
+          shapes: ['circle']
+        });
+      }, 250);
+    }
+
+    btnClaimKisses.addEventListener('click', () => {
+      // Validar que no sea cero
+      if (!isInfinite) {
+        const val = parseInt(kissCountInput.value, 10);
+        if (isNaN(val) || val <= 0) {
+          updateCounter(1);
+          return;
+        }
+      }
+
+      // Configurar texto final
+      if (isInfinite) {
+        finalKissDisplay.textContent = "¡Besitos INFINITOS de por vida! ✨♾️";
+      } else {
+        const count = parseInt(kissCountInput.value, 10);
+        finalKissDisplay.textContent = `${count.toLocaleString()} besitos 💋`;
+      }
+
+      // Pasar a la vista final
+      view2.classList.add('hidden');
+      view3.classList.remove('hidden');
+
+      // Lanzar lluvia de celebración
+      launchCelebrationRain();
+    });
+
+    btnReset.addEventListener('click', () => {
+      dodgeCount = 0;
+      btnYes.style.transform = 'scale(1)';
+      view3.classList.add('hidden');
+      view2.classList.add('hidden');
+      view1.classList.remove('hidden');
+    });
+  </script>
+</body>
+</html>
